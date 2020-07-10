@@ -1,6 +1,7 @@
 package com.mkpolo.appgfv;
 
 import android.app.Dialog;
+import android.nfc.Tag;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -8,19 +9,25 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
+import com.mkpolo.appgfv.modelo.categoria.Categoria;
 import com.mkpolo.appgfv.modelo.marca.Marca;
 import com.mkpolo.appgfv.modelo.producto.Producto;
 import com.mkpolo.appgfv.modelo.producto.ProductoAdapter;
@@ -42,12 +49,17 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
     private SwipeRefreshLayout refresh;
     private ArrayList<Producto> producto = new ArrayList<>();
     private ArrayList<Marca> marcas = new ArrayList<>();
+    private ArrayList<Categoria> listcategoria = new ArrayList<>();
+    private ArrayList<String> listaCategoria;
     private JsonArrayRequest arrayRequest;
     private RecyclerView recyclerView;
     private Dialog dialog;
     private ProductoAdapter productoAdapter;
     private ImageView clickAgregarProducto;
     private String url="http://192.168.1.60:9001/api/productos/";
+    private String url2 = "http://192.168.1.60:9001/api/categorias/";
+
+    ArrayList<String> arrastrig = new ArrayList<String>();
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -122,32 +134,101 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
 
     private void addProducto() {
         TextView closeProducto,tittleProducto;
-        final EditText edtxtProducto;
+        final EditText txtnombreProducto, txtpesoProducto, txtdiasProducto;
+        final Spinner spnMarcas, spnCategorias;
         Button submitProducto;
-        dialog.setContentView(R.layout.fragment_modmarca);
+        dialog.setContentView(R.layout.fragment_modproducto);
 
-        closeMarca = (TextView) dialog.findViewById(R.id.txtCerrar);
-        tittleMarca = (TextView) dialog.findViewById(R.id.tituloMarca);
-        tittleMarca.setText("Agregar Marca");
+        closeProducto = (TextView) dialog.findViewById(R.id.txtCerrarProducto);
+        tittleProducto = (TextView) dialog.findViewById(R.id.tituloProducto);
+        tittleProducto.setText("Agregar Producto");
 
-        closeMarca.setOnClickListener(new View.OnClickListener() {
+        closeProducto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
             }
         });
 
-        edtxtMarca = (EditText)dialog.findViewById(R.id.edtxtMarca);
-        submitMarca = (Button) dialog.findViewById(R.id.submitMarca);
+        final String idCategoria, nombreCategoria;
 
-        submitMarca.setOnClickListener(new View.OnClickListener() {
+        spnCategorias = (Spinner) dialog.findViewById(R.id.spnCategoriaProducto);
+        spnMarcas = (Spinner) dialog.findViewById(R.id.spnMarcaProducto);
+        txtnombreProducto = (EditText)dialog.findViewById(R.id.txtnombreProducto);
+        txtpesoProducto = (EditText) dialog.findViewById(R.id.txtpesoProducto);
+        txtdiasProducto = (EditText) dialog.findViewById(R.id.txtdiasProducto);
+        submitProducto = (Button) dialog.findViewById(R.id.submitMarca);
+
+        consultarListaCategorias();
+
+        ArrayAdapter<CharSequence> adaptadorCat = new ArrayAdapter(getContext(),R.layout.support_simple_spinner_dropdown_item,arrastrig);
+        spnCategorias.setAdapter(adaptadorCat);
+
+        spnCategorias.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onClick(View v) {
-                String dataMarca = "{"+"\"marca\"" +":"+ "\"" + edtxtMarca.getText().toString() + "\""+"}";
-                SubmitMarca(dataMarca);
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
             }
         });
+
+       /* submitProducto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String dataProducto = "{"+"\"marca\"" +":"+ "\"" + txtnombreProducto.getText().toString() + "\""+"}";
+               // SubmitMarca(dataProducto);
+            }
+        });*/
         dialog.show();
+    }
+
+    private void consultarListaCategorias() {
+        mostrarListaCategoria();
+
+
+
+        arrayRequest = new JsonArrayRequest(url2 + "all", new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                JSONObject jsonObject = null;
+
+                    try {
+                        for (int i = 0; i < response.length(); i++) {
+                        jsonObject = response.getJSONObject(i);
+
+                        Categoria liscat = new Categoria();
+                        liscat.setId(jsonObject.getInt("idCategoria"));
+                        liscat.setCategoria(jsonObject.getString("categoria"));
+                        listcategoria.add(liscat);
+
+                        } } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                mostrarListaCategoria();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }
+        );
+        requestQueue = Volley.newRequestQueue(getContext());
+        requestQueue.add(arrayRequest);
+    }
+
+    private void mostrarListaCategoria() {
+        arrastrig.add("Seleccione: ");
+
+
+        for(int i = 0; i<listcategoria.size(); i++){
+            arrastrig.add(listcategoria.get(i).getCategoria());
+       }
     }
 
     private void getDataProducto() {

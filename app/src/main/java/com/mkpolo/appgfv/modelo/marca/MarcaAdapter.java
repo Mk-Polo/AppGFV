@@ -79,7 +79,7 @@ public class MarcaAdapter extends RecyclerView.Adapter<MarcaAdapter.MyViewHolder
 
         dialog = new Dialog(context);
         dialog.setContentView(R.layout.delete_marca);
-        closeMarca = (TextView) dialog.findViewById(R.id.txtCerrar);
+        closeMarca = (TextView) dialog.findViewById(R.id.txtCerrarProducto);
         tittleMarca = (TextView) dialog.findViewById(R.id.tituloMarca);
         tittleMarca.setText("Eliminar Marca");
 
@@ -109,7 +109,7 @@ public class MarcaAdapter extends RecyclerView.Adapter<MarcaAdapter.MyViewHolder
 
         dialog.setContentView(R.layout.fragment_modmarca);
 
-        closeMarca = (TextView) dialog.findViewById(R.id.txtCerrar);
+        closeMarca = (TextView) dialog.findViewById(R.id.txtCerrarProducto);
         tittleMarca = (TextView) dialog.findViewById(R.id.tituloMarca);
         tittleMarca.setText("Editar Marca");
 

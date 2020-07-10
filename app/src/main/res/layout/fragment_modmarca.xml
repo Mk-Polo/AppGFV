@@ -30,7 +30,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/txtCerrar"
+            android:id="@+id/txtCerrarProducto"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_alignParentRight="true"

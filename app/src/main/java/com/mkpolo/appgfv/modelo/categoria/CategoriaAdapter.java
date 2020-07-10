@@ -79,7 +79,7 @@ public class CategoriaAdapter extends RecyclerView.Adapter<CategoriaAdapter.View
 
         dialog = new Dialog(context);
         dialog.setContentView(R.layout.delete_marca);
-        closeMarca = (TextView) dialog.findViewById(R.id.txtCerrar);
+        closeMarca = (TextView) dialog.findViewById(R.id.txtCerrarProducto);
         tittleMarca = (TextView) dialog.findViewById(R.id.tituloMarca);
         tittleMarca.setText("Eliminar Categoria");
 

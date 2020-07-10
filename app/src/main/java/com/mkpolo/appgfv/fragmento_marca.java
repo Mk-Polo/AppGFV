@@ -1,8 +1,6 @@
 package com.mkpolo.appgfv;
 
 import android.app.Dialog;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -170,7 +168,7 @@ public class fragmento_marca extends Fragment implements  SwipeRefreshLayout.OnR
         Button submitMarca;
         dialog.setContentView(R.layout.fragment_modmarca);
 
-        closeMarca = (TextView) dialog.findViewById(R.id.txtCerrar);
+        closeMarca = (TextView) dialog.findViewById(R.id.txtCerrarProducto);
         tittleMarca = (TextView) dialog.findViewById(R.id.tituloMarca);
         tittleMarca.setText("Agregar Marca");
 
