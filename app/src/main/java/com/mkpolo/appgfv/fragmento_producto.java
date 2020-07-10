@@ -11,7 +11,10 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -100,7 +103,7 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
         clickAgregarProducto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               // addProducto();
+                addProducto();
             }
         });
 
@@ -115,6 +118,36 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
         });
 
         return view;
+    }
+
+    private void addProducto() {
+        TextView closeProducto,tittleProducto;
+        final EditText edtxtProducto;
+        Button submitProducto;
+        dialog.setContentView(R.layout.fragment_modmarca);
+
+        closeMarca = (TextView) dialog.findViewById(R.id.txtCerrar);
+        tittleMarca = (TextView) dialog.findViewById(R.id.tituloMarca);
+        tittleMarca.setText("Agregar Marca");
+
+        closeMarca.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        edtxtMarca = (EditText)dialog.findViewById(R.id.edtxtMarca);
+        submitMarca = (Button) dialog.findViewById(R.id.submitMarca);
+
+        submitMarca.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String dataMarca = "{"+"\"marca\"" +":"+ "\"" + edtxtMarca.getText().toString() + "\""+"}";
+                SubmitMarca(dataMarca);
+            }
+        });
+        dialog.show();
     }
 
     private void getDataProducto() {
