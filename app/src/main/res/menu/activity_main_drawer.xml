@@ -24,5 +24,9 @@
             android:id="@+id/fragmento_categoria"
             android:icon="@android:drawable/ic_dialog_info"
             android:title="Categorias" />
+        <item
+            android:id="@+id/fragmento_producto"
+            android:icon="@android:drawable/ic_menu_save"
+            android:title="Productos" />
     </group>
     </menu>

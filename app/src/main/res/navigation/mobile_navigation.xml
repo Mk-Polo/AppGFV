@@ -32,4 +32,9 @@
         android:name="com.mkpolo.appgfv.fragmento_categoria"
         android:label="Categorias de Produtos"
         tools:layout="@layout/fragment_fragmento_categoria" />
+    <fragment
+        android:id="@+id/fragmento_producto"
+        android:name="com.mkpolo.appgfv.fragmento_producto"
+        android:label="Productos"
+        tools:layout="@layout/fragment_fragmento_producto" />
 </navigation>

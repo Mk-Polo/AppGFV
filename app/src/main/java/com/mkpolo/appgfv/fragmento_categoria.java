@@ -214,7 +214,7 @@ public class fragmento_categoria extends Fragment implements SwipeRefreshLayout.
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getContext(), "No se puede listar datos", Toast.LENGTH_SHORT).show();
+
             }
         }
         );

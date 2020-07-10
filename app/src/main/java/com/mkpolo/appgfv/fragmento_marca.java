@@ -112,7 +112,6 @@ public class fragmento_marca extends Fragment implements  SwipeRefreshLayout.OnR
             }
         });
 
-        //refresh.setOnRefreshListener((SwipeRefreshLayout.OnRefreshListener) getContext());
         refresh.setOnRefreshListener(this);
 
         refresh.post(new Runnable() {
