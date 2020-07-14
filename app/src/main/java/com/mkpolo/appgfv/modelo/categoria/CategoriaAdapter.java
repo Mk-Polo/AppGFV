@@ -58,6 +58,7 @@ public class CategoriaAdapter extends RecyclerView.Adapter<CategoriaAdapter.View
             public void onClick(View v) {
                 int id = categoria.get(position).getId();
                 String valueCat = categoria.get(position).getCategoria();
+
                 editarCategoria(id, valueCat);
             }
         });
@@ -120,8 +121,8 @@ public class CategoriaAdapter extends RecyclerView.Adapter<CategoriaAdapter.View
             }
         });
 
-        edtxtCategoria = (EditText)dialog.findViewById(R.id.edtxtMarca);
-        submitCategoria = (Button) dialog.findViewById(R.id.submitMarca);
+        edtxtCategoria = (EditText)dialog.findViewById(R.id.edtxtCategoria);
+        submitCategoria = (Button) dialog.findViewById(R.id.submitCategoria);
 
         edtxtCategoria.setText(valueCat);
 

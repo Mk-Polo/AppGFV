@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.nfc.Tag;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,10 +23,13 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.mkpolo.appgfv.modelo.categoria.Categoria;
 import com.mkpolo.appgfv.modelo.marca.Marca;
@@ -36,6 +40,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 /**
@@ -48,18 +53,27 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
     private RequestQueue requestQueue;
     private SwipeRefreshLayout refresh;
     private ArrayList<Producto> producto = new ArrayList<>();
-    private ArrayList<Marca> marcas = new ArrayList<>();
-    private ArrayList<Categoria> listcategoria = new ArrayList<>();
-    private ArrayList<String> listaCategoria;
+
+    private ArrayList<Marca> listaMarcas;
+    private ArrayList<Categoria> listcategoria;
+
     private JsonArrayRequest arrayRequest;
     private RecyclerView recyclerView;
     private Dialog dialog;
     private ProductoAdapter productoAdapter;
     private ImageView clickAgregarProducto;
+
+    private ImageView editProducto;
+
     private String url="http://192.168.1.60:9001/api/productos/";
     private String url2 = "http://192.168.1.60:9001/api/categorias/";
+    private String url3 = "http://192.168.1.60:9001/api/marcas/";
 
-    ArrayList<String> arrastrig = new ArrayList<String>();
+    private Categoria categoriaspinner = new Categoria();
+    private Marca marcaspinner = new Marca();
+
+    ArrayList<String> agregarComboMarca = new ArrayList<String>();
+    ArrayList<String> agregarComboCat = new ArrayList<String>();
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -110,6 +124,10 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
         recyclerView = view.findViewById(R.id.recyclerProducto);
         clickAgregarProducto = view.findViewById(R.id.clickAgregarProducto);
 
+
+        consultarListaCategorias();
+        consultarListaMarcas();
+
         dialog = new Dialog(getContext());
 
         clickAgregarProducto.setOnClickListener(new View.OnClickListener() {
@@ -132,11 +150,13 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
         return view;
     }
 
+
     private void addProducto() {
         TextView closeProducto,tittleProducto;
         final EditText txtnombreProducto, txtpesoProducto, txtdiasProducto;
         final Spinner spnMarcas, spnCategorias;
         Button submitProducto;
+
         dialog.setContentView(R.layout.fragment_modproducto);
 
         closeProducto = (TextView) dialog.findViewById(R.id.txtCerrarProducto);
@@ -150,23 +170,38 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
             }
         });
 
-        final String idCategoria, nombreCategoria;
-
         spnCategorias = (Spinner) dialog.findViewById(R.id.spnCategoriaProducto);
         spnMarcas = (Spinner) dialog.findViewById(R.id.spnMarcaProducto);
         txtnombreProducto = (EditText)dialog.findViewById(R.id.txtnombreProducto);
         txtpesoProducto = (EditText) dialog.findViewById(R.id.txtpesoProducto);
         txtdiasProducto = (EditText) dialog.findViewById(R.id.txtdiasProducto);
-        submitProducto = (Button) dialog.findViewById(R.id.submitMarca);
+        submitProducto = (Button) dialog.findViewById(R.id.submitProducto);
 
-        consultarListaCategorias();
+        ArrayAdapter<CharSequence> adaptadorMarca = new ArrayAdapter(getContext(),R.layout.support_simple_spinner_dropdown_item, agregarComboMarca);
+        spnMarcas.setAdapter(adaptadorMarca);
 
-        ArrayAdapter<CharSequence> adaptadorCat = new ArrayAdapter(getContext(),R.layout.support_simple_spinner_dropdown_item,arrastrig);
+        spnMarcas.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                marcaspinner.setId(listaMarcas.get(position).getId());
+                marcaspinner.setMarca(listaMarcas.get(position).getMarca());
+                Toast.makeText(view.getContext(), marcaspinner.getMarca(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        ArrayAdapter<CharSequence> adaptadorCat = new ArrayAdapter(getContext(),R.layout.support_simple_spinner_dropdown_item, agregarComboCat);
         spnCategorias.setAdapter(adaptadorCat);
 
         spnCategorias.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                categoriaspinner.setId(listcategoria.get(position).getId());
+                categoriaspinner.setCategoria(listcategoria.get(position).getCategoria());
 
             }
 
@@ -176,21 +211,60 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
             }
         });
 
-       /* submitProducto.setOnClickListener(new View.OnClickListener() {
+       submitProducto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String dataProducto = "{"+"\"marca\"" +":"+ "\"" + txtnombreProducto.getText().toString() + "\""+"}";
-               // SubmitMarca(dataProducto);
+                String dataProducto = "{\"categoria\":{\"idCategoria\":"+ categoriaspinner.getId() +",\"categoria\":\""
+                        + categoriaspinner.getCategoria() + "\"},\"marca\":{\"idMarca\":" + marcaspinner.getId() + ",\"marca\":\""
+                        + marcaspinner.getMarca() +"\"},\"producto\":\"" + txtnombreProducto.getText().toString() + "\",\"peso\":\""
+                        + txtpesoProducto.getText().toString() + "\",\"acciones\":null,\"dias\":" + txtdiasProducto.getText().toString() + "}";
+                SubmitProducto(dataProducto);
             }
-        });*/
+        });
         dialog.show();
     }
 
+    private void SubmitProducto(String dataProducto) {
+        final  String saveProducto = dataProducto;
+        StringRequest request =new StringRequest(Request.Method.POST, url + "save", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONObject objcat= new JSONObject(response);
+                    dialog.dismiss();
+                    refresh.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            producto.clear();
+                            getDataProducto();
+                        }
+                    });
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getContext(), "No se pudieron agregar datos", Toast.LENGTH_SHORT).show();
+            }
+        }){
+            public String getBodyContentType(){
+                return "application/json; charset=utf-8";
+            }
+            public byte[] getBody() throws AuthFailureError {
+                try {
+                    return saveProducto == null ? null : saveProducto.getBytes("utf-8");
+                }catch (UnsupportedEncodingException uee){
+                    return null;
+                }
+            }
+        };
+        Volley.newRequestQueue(getContext()).add(request);
+    }
+
     private void consultarListaCategorias() {
-        mostrarListaCategoria();
-
-
-
+        listcategoria = new ArrayList<>();
         arrayRequest = new JsonArrayRequest(url2 + "all", new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
@@ -223,12 +297,48 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
     }
 
     private void mostrarListaCategoria() {
-        arrastrig.add("Seleccione: ");
-
-
         for(int i = 0; i<listcategoria.size(); i++){
-            arrastrig.add(listcategoria.get(i).getCategoria());
-       }
+            agregarComboCat.add(listcategoria.get(i).getCategoria());
+        }
+    }
+
+    private void consultarListaMarcas() {
+        listaMarcas = new ArrayList<>();
+        arrayRequest = new JsonArrayRequest(url3 + "all", new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                JSONObject jsonObject = null;
+
+                try {
+                    for (int i = 0; i < response.length(); i++) {
+                        jsonObject = response.getJSONObject(i);
+
+                        Marca lismarc = new Marca();
+                        lismarc.setId(jsonObject.getInt("idMarca"));
+                        lismarc.setMarca(jsonObject.getString("marca"));
+                        listaMarcas.add(lismarc);
+
+                    } } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                mostrarListaMarca();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }
+        );
+        requestQueue = Volley.newRequestQueue(getContext());
+        requestQueue.add(arrayRequest);
+    }
+
+    private void mostrarListaMarca() {
+        for(int i = 0; i<listaMarcas.size(); i++){
+            agregarComboMarca.add(listaMarcas.get(i).getMarca());
+        }
     }
 
     private void getDataProducto() {

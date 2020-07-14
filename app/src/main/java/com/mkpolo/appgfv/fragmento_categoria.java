@@ -101,7 +101,7 @@ public class fragmento_categoria extends Fragment implements SwipeRefreshLayout.
         clickAgregarCategoria = view.findViewById(R.id.clickAgregarCategoria);
 
         dialog = new Dialog(getContext());
-        
+
         clickAgregarCategoria.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
