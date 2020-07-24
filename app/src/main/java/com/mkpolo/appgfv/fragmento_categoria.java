@@ -222,10 +222,58 @@ public class fragmento_categoria extends Fragment implements SwipeRefreshLayout.
         requestQueue.add(arrayRequest);
     }
 
-    private void adapterPush(ArrayList<Categoria> categoria) {
+    private void adapterPush(final ArrayList<Categoria> categoria) {
         categoriaAdapter = new CategoriaAdapter(getContext(), categoria);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(categoriaAdapter);
+
+        categoriaAdapter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String nombre= categoria.get(recyclerView.getChildAdapterPosition(v)).getCategoria();
+                int id = categoria.get(recyclerView.getChildAdapterPosition(v)).getId();
+
+                dialog = new Dialog(getContext());
+
+                editarCategoria(nombre, id);
+            }
+        });
+
+    }
+
+    private void editarCategoria(String valueCat, final int id) {
+        TextView closeCategoria,tittleCategoria;
+        final EditText edtxtCategoria;
+        Button submitCategoria;
+
+        dialog.setContentView(R.layout.fragment_modcategoria);
+
+        closeCategoria = (TextView) dialog.findViewById(R.id.txtCerrarCategoria);
+        tittleCategoria = (TextView) dialog.findViewById(R.id.tituloCategoria);
+        tittleCategoria.setText("Editar Categoria");
+
+        closeCategoria.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        edtxtCategoria = (EditText)dialog.findViewById(R.id.edtxtCategoria);
+        submitCategoria = (Button) dialog.findViewById(R.id.submitCategoria);
+
+        edtxtCategoria.setText(valueCat);
+
+        submitCategoria.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String dataCategoria = "{"+"\"categoria\"" +":"+ "\"" + edtxtCategoria.getText().toString() + "\","+
+                        "\"idCategoria\"" +":"+ "\"" + id + "\""+
+                        "}";
+                SubmitCategoria(dataCategoria);
+            }
+        });
+        dialog.show();
     }
 
     @Override

@@ -28,11 +28,14 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
-public class CategoriaAdapter extends RecyclerView.Adapter<CategoriaAdapter.ViewMyHolderCategoria> {
+public class CategoriaAdapter extends RecyclerView.Adapter<CategoriaAdapter.ViewMyHolderCategoria> implements View.OnClickListener{
 
     private Context context;
     private ArrayList<Categoria> categoria;
     private String url="http://192.168.1.60:9001/api/categorias/";
+
+    //Enviar click position
+    private View.OnClickListener listenerCat;
 
     public CategoriaAdapter(Context context, ArrayList<Categoria> categoria) {
         this.context = context;
@@ -46,7 +49,16 @@ public class CategoriaAdapter extends RecyclerView.Adapter<CategoriaAdapter.View
 
         LayoutInflater layoutInflater = LayoutInflater.from(context);
         view = layoutInflater.inflate(R.layout.categoria_lista, parent, false);
+
+        //Enviar click position
+        view.setOnClickListener(this);
+
         return new ViewMyHolderCategoria(view);
+    }
+
+    //Enviar click position
+    public void setOnClickListener(View.OnClickListener listener){
+        this.listenerCat = listener;
     }
 
     @Override
@@ -191,6 +203,14 @@ public class CategoriaAdapter extends RecyclerView.Adapter<CategoriaAdapter.View
     @Override
     public int getItemCount() {
         return categoria.size();
+    }
+
+    //Enviar click position
+    @Override
+    public void onClick(View v) {
+        if(listenerCat!= null){
+            listenerCat.onClick(v);
+        }
     }
 
     public class ViewMyHolderCategoria extends RecyclerView.ViewHolder {
