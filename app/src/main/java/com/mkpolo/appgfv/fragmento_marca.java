@@ -156,10 +156,56 @@ public class fragmento_marca extends Fragment implements  SwipeRefreshLayout.OnR
         requestQueue.add(arrayRequest);
     }
 
-    private void adapterPush(ArrayList<Marca> marca) {
+    private void adapterPush(final ArrayList<Marca> marca) {
         marcaAdapter = new MarcaAdapter(getContext(), marca);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(marcaAdapter);
+
+        marcaAdapter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String nombre = marca.get(recyclerView.getChildAdapterPosition(v)).getMarca();
+                int id = marca.get(recyclerView.getChildAdapterPosition(v)).getId();
+
+                editarMarca(nombre, id);
+            }
+        });
+
+    }
+
+    private void editarMarca(String nombre, final int id) {
+        TextView closeMarca,tittleMarca;
+        final EditText edtxtMarca;
+        Button submitMarca;
+
+        dialog.setContentView(R.layout.fragment_modmarca);
+
+        closeMarca = (TextView) dialog.findViewById(R.id.txtCerrarProducto);
+        tittleMarca = (TextView) dialog.findViewById(R.id.tituloMarca);
+        tittleMarca.setText("Editar Marca");
+
+        closeMarca.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        edtxtMarca = (EditText)dialog.findViewById(R.id.edtxtMarca);
+        submitMarca = (Button) dialog.findViewById(R.id.submitMarca);
+
+        edtxtMarca.setText(nombre);
+
+        submitMarca.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String dataMarca = "{"+"\"marca\"" +":"+ "\"" + edtxtMarca.getText().toString() + "\","+
+                        "\"idMarca\"" +":"+ "\"" + id + "\""+
+                        "}";
+                SubmitMarca(dataMarca);
+            }
+        });
+        dialog.show();
     }
 
     private void addMarca(){
