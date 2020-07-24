@@ -14,11 +14,12 @@ import com.mkpolo.appgfv.R;
 
 import java.util.ArrayList;
 
-public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.MyViewProducto> {
+public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.MyViewProducto> implements View.OnClickListener{
 
     private Context context;
     private ArrayList<Producto> producto;
-    private String url = "http://192.168.1.60:9001/api/productos/";
+    private View.OnClickListener listenerProd;
+
 
     public ProductoAdapter(Context context, ArrayList<Producto> producto) {
         this.context = context;
@@ -33,7 +34,13 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.MyView
         LayoutInflater layoutInflater = LayoutInflater.from(context);
         view = layoutInflater.inflate(R.layout.producto_lista, parent, false);
 
+        view.setOnClickListener(this);
+
         return new MyViewProducto(view);
+    }
+
+    public void setOnClickListener(View.OnClickListener listener){
+        this.listenerProd = listener;
     }
 
     @Override
@@ -50,9 +57,15 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.MyView
         return producto.size();
     }
 
+    @Override
+    public void onClick(View v) {
+        if(listenerProd != null){
+            listenerProd.onClick(v);
+        }
+    }
+
     public class MyViewProducto extends RecyclerView.ViewHolder {
         private TextView nombreProducto, noProducto, marcaProducto, catProducto, diasProducto, pesoProducto;
-        private ImageView editProducto, deleteProducto;
 
         public MyViewProducto(@NonNull View itemView) {
             super(itemView);
@@ -61,8 +74,6 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.MyView
             nombreProducto = (TextView) itemView.findViewById(R.id.nombreProducto);
             pesoProducto = (TextView) itemView.findViewById(R.id.pesoProducto);
             diasProducto = (TextView) itemView.findViewById(R.id.diasProducto);
-            editProducto = (ImageView) itemView.findViewById(R.id.editProducto);
-            deleteProducto = (ImageView) itemView.findViewById(R.id.deleteProducto);
         }
     }
 }

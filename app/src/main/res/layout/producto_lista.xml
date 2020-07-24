@@ -31,8 +31,8 @@
         android:layout_marginStart="70dp"
         android:layout_marginLeft="70dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="70dp"
-        android:layout_marginRight="70dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginRight="20dp"
         android:paddingLeft="5dp"
         android:text="Braedt"
         android:textColor="#000000"
@@ -48,8 +48,8 @@
         android:layout_marginStart="70dp"
         android:layout_marginLeft="70dp"
         android:layout_marginTop="4dp"
-        android:layout_marginEnd="70dp"
-        android:layout_marginRight="70dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginRight="20dp"
         android:paddingLeft="5dp"
         android:text="jamon"
         android:textColor="#000000"
@@ -65,8 +65,8 @@
         android:layout_marginStart="70dp"
         android:layout_marginLeft="70dp"
         android:layout_marginTop="4dp"
-        android:layout_marginEnd="70dp"
-        android:layout_marginRight="70dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginRight="20dp"
         android:paddingLeft="5dp"
         android:text="250 gramos"
         android:textColor="#000000"
@@ -96,8 +96,8 @@
         android:layout_marginStart="160dp"
         android:layout_marginLeft="160dp"
         android:layout_marginTop="4dp"
-        android:layout_marginEnd="70dp"
-        android:layout_marginRight="70dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginRight="20dp"
         android:layout_marginBottom="8dp"
         android:paddingLeft="5dp"
         android:text="10"
@@ -108,29 +108,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/pesoProducto"
         app:layout_constraintVertical_bias="0.238" />
-
-    <ImageView
-        android:id="@+id/editProducto"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginRight="20dp"
-        android:background="#FFEB3B"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@android:drawable/ic_menu_edit" />
-
-    <ImageView
-        android:id="@+id/deleteProducto"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginBottom="16dp"
-        android:background="#DD0A0A"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@android:drawable/ic_menu_delete" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -185,7 +185,6 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 marcaspinner.setId(listaMarcas.get(position).getId());
                 marcaspinner.setMarca(listaMarcas.get(position).getMarca());
-                Toast.makeText(view.getContext(), marcaspinner.getMarca(), Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -202,7 +201,6 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 categoriaspinner.setId(listcategoria.get(position).getId());
                 categoriaspinner.setCategoria(listcategoria.get(position).getCategoria());
-
             }
 
             @Override
@@ -347,6 +345,7 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
             @Override
             public void onResponse(JSONArray response) {
                 JSONObject jsonObject = null;
+                JSONObject categor = null;
                 JSONObject marca = null;
                 for (int i = 0; i < response.length(); i++) {
                     try {
@@ -354,6 +353,11 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
 
                         Producto produc = new Producto();
                         produc.setId(jsonObject.getInt("idProducto"));
+                        Categoria cat = new Categoria();
+                        categor = jsonObject.getJSONObject("categoria");
+                        cat.setId(categor.getInt("idCategoria"));
+                        cat.setCategoria(categor.getString("categoria"));
+                        produc.setCategoria(cat);
                         Marca mar = new Marca();
                         marca = jsonObject.getJSONObject("marca");
                         mar.setId(marca.getInt("idMarca"));
@@ -382,10 +386,101 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
         requestQueue.add(arrayRequest);
     }
 
-    private void adapterPush(ArrayList<Producto> producto) {
+    private void adapterPush(final ArrayList<Producto> producto) {
         productoAdapter = new ProductoAdapter(getContext(), producto);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(productoAdapter);
+
+        productoAdapter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String categoria = producto.get(recyclerView.getChildAdapterPosition(v)).getCategoria().getCategoria();
+                String marca = producto.get(recyclerView.getChildAdapterPosition(v)).getMarca().getMarca();
+                String produc = producto.get(recyclerView.getChildAdapterPosition(v)).getNombreProducto();
+                String peso = producto.get(recyclerView.getChildAdapterPosition(v)).getPesoProducto();
+                int dias = producto.get(recyclerView.getChildAdapterPosition(v)).getDiasProducto();
+                int id = producto.get(recyclerView.getChildAdapterPosition(v)).getId();
+
+                editarProducto(categoria,marca,produc,peso,dias,id);
+
+            }
+        });
+    }
+
+    private void editarProducto(String categoria, String marca, String produc, String peso, int dias, final int id) {
+        TextView closeProducto,tittleProducto;
+        final EditText txtnombreProducto, txtpesoProducto, txtdiasProducto;
+        final Spinner spnMarcas, spnCategorias;
+        Button submitProducto;
+
+        dialog.setContentView(R.layout.fragment_modproducto);
+
+        closeProducto = (TextView) dialog.findViewById(R.id.txtCerrarProducto);
+        tittleProducto = (TextView) dialog.findViewById(R.id.tituloProducto);
+        tittleProducto.setText("Editar Producto");
+
+        closeProducto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        spnCategorias = (Spinner) dialog.findViewById(R.id.spnCategoriaProducto);
+        spnMarcas = (Spinner) dialog.findViewById(R.id.spnMarcaProducto);
+        txtnombreProducto = (EditText)dialog.findViewById(R.id.txtnombreProducto);
+        txtpesoProducto = (EditText) dialog.findViewById(R.id.txtpesoProducto);
+        txtdiasProducto = (EditText) dialog.findViewById(R.id.txtdiasProducto);
+        submitProducto = (Button) dialog.findViewById(R.id.submitProducto);
+
+        ArrayAdapter<CharSequence> adaptadorMarca = new ArrayAdapter(getContext(),R.layout.support_simple_spinner_dropdown_item, agregarComboMarca);
+        spnMarcas.setAdapter(adaptadorMarca);
+
+        spnMarcas.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                marcaspinner.setId(listaMarcas.get(position).getId());
+                marcaspinner.setMarca(listaMarcas.get(position).getMarca());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        ArrayAdapter<CharSequence> adaptadorCat = new ArrayAdapter(getContext(),R.layout.support_simple_spinner_dropdown_item, agregarComboCat);
+        spnCategorias.setAdapter(adaptadorCat);
+
+        spnCategorias.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                categoriaspinner.setId(listcategoria.get(position).getId());
+                categoriaspinner.setCategoria(listcategoria.get(position).getCategoria());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        txtnombreProducto.setText(produc);
+        txtpesoProducto.setText(peso);
+        txtdiasProducto.setText(String.valueOf(dias));
+
+        submitProducto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String dataProducto = "{\"categoria\":{\"idCategoria\":"+ categoriaspinner.getId() +",\"categoria\":\""
+                        + categoriaspinner.getCategoria() + "\"},\"marca\":{\"idMarca\":" + marcaspinner.getId() + ",\"marca\":\""
+                        + marcaspinner.getMarca() +"\"},\"producto\":\"" + txtnombreProducto.getText().toString() + "\",\"peso\":\""
+                        + txtpesoProducto.getText().toString() + "\",\"acciones\":null,\"dias\":" + txtdiasProducto.getText().toString()
+                        + ",\"idProducto\":" + id + "}";
+                SubmitProducto(dataProducto);
+            }
+        });
+        dialog.show();
     }
 
     @Override
