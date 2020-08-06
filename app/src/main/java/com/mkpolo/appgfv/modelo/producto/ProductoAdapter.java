@@ -45,11 +45,16 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.MyView
 
     @Override
     public void onBindViewHolder(@NonNull ProductoAdapter.MyViewProducto holder, int position) {
-        holder.noProducto.setText("#" + String.valueOf(position + 1));
+        //holder.noProducto.setText("#" + String.valueOf(position + 1));
         holder.marcaProducto.setText(producto.get(position).marca.getMarca());
         holder.nombreProducto.setText(producto.get(position).getNombreProducto());
         holder.pesoProducto.setText(producto.get(position).getPesoProducto());
         holder.diasProducto.setText(String.valueOf(producto.get(position).getDiasProducto()));
+        if(producto.get(position).getImagen() != null){
+            holder.imagen.setImageBitmap(producto.get(position).getImagen());
+        }else{
+            holder.imagen.setImageResource(R.drawable.ic_launcher_foto_muestra_foreground);
+        }
     }
 
     @Override
@@ -65,11 +70,12 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.MyView
     }
 
     public class MyViewProducto extends RecyclerView.ViewHolder {
-        private TextView nombreProducto, noProducto, marcaProducto, catProducto, diasProducto, pesoProducto;
+        private TextView nombreProducto, marcaProducto, diasProducto, pesoProducto;
+        private ImageView imagen;
 
         public MyViewProducto(@NonNull View itemView) {
             super(itemView);
-            noProducto = (TextView) itemView.findViewById(R.id.noProducto);
+            imagen = (ImageView) itemView.findViewById(R.id.imagenProducto);
             marcaProducto = (TextView) itemView.findViewById(R.id.productoMarca);
             nombreProducto = (TextView) itemView.findViewById(R.id.nombreProducto);
             pesoProducto = (TextView) itemView.findViewById(R.id.pesoProducto);

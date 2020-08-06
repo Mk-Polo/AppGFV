@@ -1,5 +1,9 @@
 package com.mkpolo.appgfv.modelo.producto;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
+
 import com.mkpolo.appgfv.modelo.categoria.Categoria;
 import com.mkpolo.appgfv.modelo.marca.Marca;
 
@@ -17,16 +21,63 @@ public class Producto {
 
     int diasProducto;
 
+    private String dato;
+
+    private Bitmap imagen;
+
+    private String rutaImagen;
+
     public Producto() {
     }
 
-    public Producto(int id, Categoria categoria, Marca marca, String nombreProducto, String pesoProducto, int diasProducto) {
+    public Producto(int id, Categoria categoria, Marca marca, String nombreProducto, String pesoProducto, int diasProducto, String dato, Bitmap imagen, String rutaImagen) {
         this.id = id;
         this.categoria = categoria;
         this.marca = marca;
         this.nombreProducto = nombreProducto;
         this.pesoProducto = pesoProducto;
         this.diasProducto = diasProducto;
+        this.dato = dato;
+        this.imagen = imagen;
+        this.rutaImagen = rutaImagen;
+    }
+
+    public String getDato() {
+        return dato;
+    }
+
+    public void setDato(String dato) {
+        this.dato = dato;
+
+        try{
+            byte[] byteCode= Base64.decode(dato,Base64.DEFAULT);
+            //this.imagen= BitmapFactory.decodeByteArray(byteCode,0,byteCode.length);
+
+            int alto=100;//alto en pixeles
+            int ancho=100;//ancho en pixeles
+
+            Bitmap foto= BitmapFactory.decodeByteArray(byteCode,0,byteCode.length);
+            this.imagen=Bitmap.createScaledBitmap(foto,alto,ancho,true);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+    public Bitmap getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(Bitmap imagen) {
+        this.imagen = imagen;
+    }
+
+    public String getRutaImagen() {
+        return rutaImagen;
+    }
+
+    public void setRutaImagen(String rutaImagen) {
+        this.rutaImagen = rutaImagen;
     }
 
     public int getId() {
