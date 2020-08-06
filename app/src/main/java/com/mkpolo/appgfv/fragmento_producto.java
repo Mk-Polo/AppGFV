@@ -22,6 +22,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.provider.MediaStore;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -536,18 +537,19 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
                 String peso = producto.get(recyclerView.getChildAdapterPosition(v)).getPesoProducto();
                 int dias = producto.get(recyclerView.getChildAdapterPosition(v)).getDiasProducto();
                 int id = producto.get(recyclerView.getChildAdapterPosition(v)).getId();
-
-                editarProducto(categoria,marca,produc,peso,dias,id);
+                Bitmap enviarImagen = producto.get(recyclerView.getChildAdapterPosition(v)).getImagen();
+                //String imagen = convertirImgString(producto.get(recyclerView.getChildAdapterPosition(v)).getImagen());
+                editarProducto(categoria,marca,produc,peso,dias,enviarImagen,id);
 
             }
         });
     }
 
-    private void editarProducto(String categoria, String marca, String produc, String peso, int dias, final int id) {
+    private void editarProducto(String categoria, String marca, String produc, String peso, int dias, Bitmap enviarImagen, final int id) {
         TextView closeProducto,tittleProducto;
         final EditText txtnombreProducto, txtpesoProducto, txtdiasProducto;
         final Spinner spnMarcas, spnCategorias;
-        Button submitProducto;
+        Button submitProducto, agregarFoto;
 
         dialog.setContentView(R.layout.fragment_modproducto);
 
@@ -567,7 +569,18 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
         txtnombreProducto = (EditText)dialog.findViewById(R.id.txtnombreProducto);
         txtpesoProducto = (EditText) dialog.findViewById(R.id.txtpesoProducto);
         txtdiasProducto = (EditText) dialog.findViewById(R.id.txtdiasProducto);
+        imgFoto =(ImageView) dialog.findViewById(R.id.fotoProducto);
+        agregarFoto =(Button) dialog.findViewById(R.id.btnAgregarFoto);
         submitProducto = (Button) dialog.findViewById(R.id.submitProducto);
+
+        bitmap = enviarImagen;
+
+        agregarFoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mostrarOpcionesFoto();
+            }
+        });
 
         ArrayAdapter<CharSequence> adaptadorMarca = new ArrayAdapter(getContext(),R.layout.support_simple_spinner_dropdown_item, agregarComboMarca);
         spnMarcas.setAdapter(adaptadorMarca);
@@ -604,16 +617,26 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
         txtnombreProducto.setText(produc);
         txtpesoProducto.setText(peso);
         txtdiasProducto.setText(String.valueOf(dias));
+        imgFoto.setImageBitmap(enviarImagen);
 
         submitProducto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                final String imagen;
+                if(bitmap != null) {
+                    imagen = convertirImgString(bitmap);
+                }else{
+                    imagen = null;
+                }
+
                 String dataProducto = "{\"categoria\":{\"idCategoria\":"+ categoriaspinner.getId() +",\"categoria\":\""
                         + categoriaspinner.getCategoria() + "\"},\"marca\":{\"idMarca\":" + marcaspinner.getId() + ",\"marca\":\""
                         + marcaspinner.getMarca() +"\"},\"producto\":\"" + txtnombreProducto.getText().toString() + "\",\"peso\":\""
                         + txtpesoProducto.getText().toString() + "\",\"acciones\":null,\"dias\":" + txtdiasProducto.getText().toString()
-                        + ",\"idProducto\":" + id + "}";
+                        + ",\"imagen\":\"" + imagen + "\",\"idProducto\":" + id + "}";
                 SubmitProducto(dataProducto);
+                Log.i("pATH", "" + dataProducto);
             }
         });
         dialog.show();
