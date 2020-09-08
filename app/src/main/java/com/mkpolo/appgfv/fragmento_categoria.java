@@ -25,6 +25,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.mkpolo.appgfv.modelo.categoria.Categoria;
 import com.mkpolo.appgfv.modelo.categoria.CategoriaAdapter;
 
@@ -49,7 +50,7 @@ public class fragmento_categoria extends Fragment implements SwipeRefreshLayout.
     private RecyclerView recyclerView;
     private Dialog dialog;
     private CategoriaAdapter categoriaAdapter;
-    private ImageView clickAgregarCategoria;
+    private FloatingActionButton clickAgregarCategoria;
     private String url="http://192.168.1.60:9001/api/categorias/";
 
     // TODO: Rename parameter arguments, choose names that match
@@ -98,7 +99,7 @@ public class fragmento_categoria extends Fragment implements SwipeRefreshLayout.
         View view = inflater.inflate(R.layout.fragment_fragmento_categoria, container, false);
         refresh = view.findViewById(R.id.swipedownCategoria);
         recyclerView = view.findViewById(R.id.recyclerCategoria);
-        clickAgregarCategoria = view.findViewById(R.id.clickAgregarCategoria);
+        clickAgregarCategoria = view.findViewById(R.id.agregarCategoria);
 
         dialog = new Dialog(getContext());
 

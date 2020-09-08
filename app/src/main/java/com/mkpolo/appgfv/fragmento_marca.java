@@ -25,6 +25,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.mkpolo.appgfv.modelo.marca.Marca;
 import com.mkpolo.appgfv.modelo.marca.MarcaAdapter;
 
@@ -49,7 +50,7 @@ public class fragmento_marca extends Fragment implements  SwipeRefreshLayout.OnR
     private RecyclerView recyclerView;
     private Dialog dialog;
     private MarcaAdapter marcaAdapter;
-    private ImageView clickAgregar;
+    private FloatingActionButton clickAgregar;
     private String url="http://192.168.1.60:9001/api/marcas/";
 
     // TODO: Rename parameter arguments, choose names that match

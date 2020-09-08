@@ -7,8 +7,7 @@
     android:layout_marginLeft="5dp"
     android:layout_marginTop="10dp"
     android:layout_marginRight="5dp"
-    android:alpha="0.6"
-    android:background="#FFFFFF">
+    android:background="@drawable/estilo_lista">
 
     <TextView
         android:id="@+id/noMarca"

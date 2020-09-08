@@ -43,6 +43,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.mkpolo.appgfv.modelo.categoria.Categoria;
 import com.mkpolo.appgfv.modelo.marca.Marca;
 import com.mkpolo.appgfv.modelo.producto.Producto;
@@ -85,7 +86,7 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
     private RecyclerView recyclerView;
     private Dialog dialog;
     private ProductoAdapter productoAdapter;
-    private ImageView clickAgregarProducto;
+    private FloatingActionButton clickAgregarProducto;
 
     private String url="http://192.168.1.60:9001/api/productos/";
     private String url2 = "http://192.168.1.60:9001/api/categorias/";
