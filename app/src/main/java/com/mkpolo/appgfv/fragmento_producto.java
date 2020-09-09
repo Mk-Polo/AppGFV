@@ -20,6 +20,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.google.zxing.integration.android.IntentIntegrator;
+
 import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
@@ -44,6 +46,7 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.zxing.integration.android.IntentResult;
 import com.mkpolo.appgfv.modelo.categoria.Categoria;
 import com.mkpolo.appgfv.modelo.marca.Marca;
 import com.mkpolo.appgfv.modelo.producto.Producto;
@@ -101,6 +104,9 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
     File fileImage;
     Bitmap bitmap;
 
+    //Scanner
+    private EditText txtCodBarras;
+
     ArrayList<String> agregarComboMarca = new ArrayList<String>();
     ArrayList<String> agregarComboCat = new ArrayList<String>();
 
@@ -153,7 +159,6 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
         recyclerView = view.findViewById(R.id.recyclerProducto);
         clickAgregarProducto = view.findViewById(R.id.clickAgregarProducto);
 
-
         consultarListaCategorias();
         consultarListaMarcas();
 
@@ -183,8 +188,8 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
     private void addProducto() {
         TextView closeProducto,tittleProducto;
         final EditText txtnombreProducto, txtpesoProducto, txtdiasProducto;
-        final Spinner spnMarcas, spnCategorias;
-        Button submitProducto, agregarFoto;
+        final Spinner spnMarcas, spnCategorias;;
+        Button submitProducto, agregarFoto, btnBarra;;
 
         dialog.setContentView(R.layout.fragment_modproducto);
 
@@ -207,6 +212,9 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
         imgFoto =(ImageView) dialog.findViewById(R.id.fotoProducto);
         agregarFoto =(Button) dialog.findViewById(R.id.btnAgregarFoto);
         submitProducto = (Button) dialog.findViewById(R.id.submitProducto);
+
+        btnBarra = (Button) dialog.findViewById(R.id.btnBarra);
+        txtCodBarras = (EditText) dialog.findViewById(R.id.txtBarra);
 
         agregarFoto.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -247,6 +255,13 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
             }
         });
 
+        btnBarra.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                escanear();
+            }
+        });
+
         submitProducto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -260,12 +275,17 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
                         + categoriaspinner.getCategoria() + "\"},\"marca\":{\"idMarca\":" + marcaspinner.getId() + ",\"marca\":\""
                         + marcaspinner.getMarca() +"\"},\"producto\":\"" + txtnombreProducto.getText().toString() + "\",\"peso\":\""
                         + txtpesoProducto.getText().toString() + "\",\"acciones\":null,\"dias\":" + txtdiasProducto.getText().toString()
-                        + ",\"imagen\":\"" + imagen + "\"}";
+                        + ",\"imagen\":\"" + imagen + "\",\"barra\":"+ String.valueOf(txtCodBarras.getText().toString()) +"}";
                 SubmitProducto(dataProducto);
+
             }
         });
         dialog.show();
 
+    }
+
+    private void escanear() {
+        IntentIntegrator.forSupportFragment(fragmento_producto.this).initiateScan();
     }
 
     private String convertirImgString(Bitmap bitmap) {
@@ -337,6 +357,8 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+
         switch (requestCode){
             case COD_SELECCIONA:
                 if(resultCode == Activity.RESULT_OK) { //Validamos la respuesta de la galeria
@@ -353,6 +375,13 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
                 if(resultCode == Activity.RESULT_OK) { //validamos la respuesta de la camara
                     bitmap = (Bitmap) data.getExtras().get("data");
                     imgFoto.setImageBitmap(bitmap);
+                }
+                break;
+            case 49374:
+                if(resultCode == Activity.RESULT_OK){
+                    txtCodBarras.setText(result.getContents());
+                }else {
+                    Toast.makeText(getContext(), "CANCELASTE EL ESCANER", Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
@@ -504,6 +533,7 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
                         produc.setPesoProducto(jsonObject.getString("peso"));
                         produc.setDiasProducto(jsonObject.getInt("dias"));
                         produc.setDato(jsonObject.getString("imagen"));
+                        produc.setBarra(jsonObject.getLong("barra"));
                         producto.add(produc);
 
                     } catch (JSONException e) {
@@ -538,19 +568,20 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
                 String peso = producto.get(recyclerView.getChildAdapterPosition(v)).getPesoProducto();
                 int dias = producto.get(recyclerView.getChildAdapterPosition(v)).getDiasProducto();
                 int id = producto.get(recyclerView.getChildAdapterPosition(v)).getId();
+                Long codigoBarra = producto.get(recyclerView.getChildAdapterPosition(v)).getBarra();
                 Bitmap enviarImagen = producto.get(recyclerView.getChildAdapterPosition(v)).getImagen();
                 //String imagen = convertirImgString(producto.get(recyclerView.getChildAdapterPosition(v)).getImagen());
-                editarProducto(categoria,marca,produc,peso,dias,enviarImagen,id);
+                editarProducto(categoria,marca,produc,peso,dias,enviarImagen,id,codigoBarra);
 
             }
         });
     }
 
-    private void editarProducto(String categoria, String marca, String produc, String peso, int dias, Bitmap enviarImagen, final int id) {
+    private void editarProducto(String categoria, String marca, String produc, String peso, int dias, Bitmap enviarImagen, final int id, Long codigoBarra) {
         TextView closeProducto,tittleProducto;
         final EditText txtnombreProducto, txtpesoProducto, txtdiasProducto;
         final Spinner spnMarcas, spnCategorias;
-        Button submitProducto, agregarFoto;
+        Button submitProducto, agregarFoto, btnBarra;
 
         dialog.setContentView(R.layout.fragment_modproducto);
 
@@ -574,12 +605,22 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
         agregarFoto =(Button) dialog.findViewById(R.id.btnAgregarFoto);
         submitProducto = (Button) dialog.findViewById(R.id.submitProducto);
 
+        btnBarra = (Button) dialog.findViewById(R.id.btnBarra);
+        txtCodBarras = (EditText) dialog.findViewById(R.id.txtBarra);
+
         bitmap = enviarImagen;
 
         agregarFoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mostrarOpcionesFoto();
+            }
+        });
+
+        btnBarra.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                escanear();
             }
         });
 
@@ -619,6 +660,7 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
         txtpesoProducto.setText(peso);
         txtdiasProducto.setText(String.valueOf(dias));
         imgFoto.setImageBitmap(enviarImagen);
+        txtCodBarras.setText(String.valueOf(codigoBarra));
 
         submitProducto.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -635,7 +677,7 @@ public class fragmento_producto extends Fragment implements SwipeRefreshLayout.O
                         + categoriaspinner.getCategoria() + "\"},\"marca\":{\"idMarca\":" + marcaspinner.getId() + ",\"marca\":\""
                         + marcaspinner.getMarca() +"\"},\"producto\":\"" + txtnombreProducto.getText().toString() + "\",\"peso\":\""
                         + txtpesoProducto.getText().toString() + "\",\"acciones\":null,\"dias\":" + txtdiasProducto.getText().toString()
-                        + ",\"imagen\":\"" + imagen + "\",\"idProducto\":" + id + "}";
+                        + ",\"imagen\":\"" + imagen + "\",\"barra\":" + String.valueOf(txtCodBarras.getText().toString()) + ",\"idProducto\":" + id + "}";
                 SubmitProducto(dataProducto);
                 Log.i("pATH", "" + dataProducto);
             }

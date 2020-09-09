@@ -21,6 +21,8 @@ public class Producto {
 
     int diasProducto;
 
+    Long barra;
+
     private String dato;
 
     private Bitmap imagen;
@@ -30,13 +32,14 @@ public class Producto {
     public Producto() {
     }
 
-    public Producto(int id, Categoria categoria, Marca marca, String nombreProducto, String pesoProducto, int diasProducto, String dato, Bitmap imagen, String rutaImagen) {
+    public Producto(int id, Categoria categoria, Marca marca, String nombreProducto, String pesoProducto, int diasProducto, Long barra, String dato, Bitmap imagen, String rutaImagen) {
         this.id = id;
         this.categoria = categoria;
         this.marca = marca;
         this.nombreProducto = nombreProducto;
         this.pesoProducto = pesoProducto;
         this.diasProducto = diasProducto;
+        this.barra = barra;
         this.dato = dato;
         this.imagen = imagen;
         this.rutaImagen = rutaImagen;
@@ -62,6 +65,14 @@ public class Producto {
             e.printStackTrace();
         }
 
+    }
+
+    public Long getBarra() {
+        return barra;
+    }
+
+    public void setBarra(Long barra) {
+        this.barra = barra;
     }
 
     public Bitmap getImagen() {
